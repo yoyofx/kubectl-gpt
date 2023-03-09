@@ -36,6 +36,13 @@ func Executor(s string) {
 		} else {
 			fmt.Println("Error, please enter the question!")
 		}
+	} else if strings.HasPrefix(s, "save") {
+		args := strings.Split(s, " ")
+		if len(args) > 1 {
+			//save yaml to file
+		}
+	} else if strings.HasPrefix(s, "switch") {
+
 	} else {
 		cmdStr := "kubectl " + s
 		debug.Log(cmdStr)

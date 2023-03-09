@@ -38,6 +38,7 @@ var commands = []prompt.Suggest{
 
 	// Custom command.
 	{Text: "gen", Description: "Generate k8s resources and commands."},
+	{Text: "save", Description: "Save generated yaml to file ptah."},
 	{Text: "exit", Description: "Exit this program"},
 }
 
