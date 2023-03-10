@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/alecthomas/chroma/quick"
 	"github.com/sashabaranov/go-openai"
+	"net/http"
+	"net/url"
 	"os"
 	"strings"
 )
@@ -21,10 +23,28 @@ var (
 
 func InitEnv() {
 	envToken, exists := os.LookupEnv("KUBE_CHATGPT_TOKEN")
+	GPTProxy, isProxy := os.LookupEnv("KUBE_CHATGPT_PROXY")
 	if !exists {
 		fmt.Println("ENV: KUBE_CHATGPT_TOKEN is not set! initializing error , chatGPT funcations will be not available !")
 	} else {
-		client = openai.NewClient(envToken)
+		if isProxy {
+			fmt.Println("chatGPT running on proxy ................")
+			//http://127.0.0.1:21112
+			config := openai.DefaultConfig(envToken)
+			proxyUrl, err := url.Parse(GPTProxy)
+			if err != nil {
+				panic(err)
+			}
+			transport := &http.Transport{
+				Proxy: http.ProxyURL(proxyUrl),
+			}
+			config.HTTPClient = &http.Client{
+				Transport: transport,
+			}
+			client = openai.NewClientWithConfig(config)
+		} else {
+			client = openai.NewClient(envToken)
+		}
 	}
 }
 
