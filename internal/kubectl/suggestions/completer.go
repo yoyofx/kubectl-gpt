@@ -1,6 +1,7 @@
 package kube
 
 import (
+	"kubectl-gpt/internal/kubectl/clientgo"
 	"os"
 	"strings"
 
@@ -145,7 +146,7 @@ func (c *Completer) completeOptionArguments(d prompt.Document) ([]prompt.Suggest
 	// namespace
 	if option == "-n" || option == "--namespace" {
 		return prompt.FilterHasPrefix(
-			getNameSpaceSuggestions(c.namespaceList),
+			clientgo.GetNameSpaceSuggestions(c.namespaceList),
 			d.GetWordBeforeCursor(),
 			true,
 		), true
@@ -168,9 +169,9 @@ func (c *Completer) completeOptionArguments(d prompt.Document) ([]prompt.Suggest
 			cmdArgs := getCommandArgs(d)
 			var suggestions []prompt.Suggest
 			if cmdArgs == nil || len(cmdArgs) < 2 {
-				suggestions = getContainerNamesFromCachedPods(c.client, c.namespace)
+				suggestions = clientgo.GetContainerNamesFromCachedPods(c.client, c.namespace)
 			} else {
-				suggestions = getContainerName(c.client, c.namespace, cmdArgs[1])
+				suggestions = clientgo.GetContainerName(c.client, c.namespace, cmdArgs[1])
 			}
 			return prompt.FilterHasPrefix(
 				suggestions,

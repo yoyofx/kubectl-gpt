@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"github.com/c-bata/go-prompt"
 	"github.com/c-bata/go-prompt/completer"
-	"kubectl-gpt/chatgpt"
-	kubeSuggestions "kubectl-gpt/kubectl_suggestions"
+	"kubectl-gpt/internal/chatgpt"
+	"kubectl-gpt/internal/kubectl"
+	"kubectl-gpt/internal/kubectl/suggestions"
 	"os"
 )
 
@@ -17,17 +18,17 @@ var (
 func main() {
 	ShowLogo()
 	// init chatGPT.
-	chatgpt.InitEnv()
-	c, err := kubeSuggestions.NewCompleter()
+	chatgpt.InitEnv() // init kubectl extension
+	kubectl.InitExtension()
+	c, err := kube.NewCompleter()
 	if err != nil {
 		fmt.Println("init error", err)
 		os.Exit(1)
 	}
 	fmt.Printf("welcome, kubectl-gpt %s (rev-%s)\n", version, revision)
 	fmt.Println("Please use `exit` or `Ctrl-D` to exit this program.")
-	defer fmt.Println("Bye!")
 	p := prompt.New(
-		kubeSuggestions.Executor,
+		kube.Executor, // exec command endpoint
 		c.Complete,
 		prompt.OptionTitle("kubectl-gpt: interactive kubernetes cmd & chatGPT client"),
 		prompt.OptionPrefix("gpt >> kubectl >> "),

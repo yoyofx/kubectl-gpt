@@ -1,6 +1,10 @@
 package kube
 
-import prompt "github.com/c-bata/go-prompt"
+import (
+	prompt "github.com/c-bata/go-prompt"
+	"kubectl-gpt/internal/kubectl"
+	"kubectl-gpt/internal/kubectl/clientgo"
+)
 
 var commands = []prompt.Suggest{
 	{Text: "get", Description: "Display one or many resources"},
@@ -37,6 +41,7 @@ var commands = []prompt.Suggest{
 	{Text: "top", Description: "Display Resource (CPU/Memory/Storage) usage"},
 
 	// Custom command.
+	{Text: "switch", Description: "Switch k8s clusters config."},
 	{Text: "gen", Description: "Generate k8s resources and commands."},
 	{Text: "save", Description: "Save generated yaml to file ptah."},
 	{Text: "exit", Description: "Exit this program"},
@@ -102,6 +107,8 @@ func (c *Completer) argumentsCompleter(namespace string, args []string) []prompt
 
 	first := args[0]
 	switch first {
+	case "switch":
+		return kubectl.GetConfigSuggestions(args)
 	case "gen":
 		subcommands := []prompt.Suggest{
 			{Text: "yaml", Description: "Generate k8s resource yaml file by chatGPT"},
@@ -170,47 +177,47 @@ func (c *Completer) argumentsCompleter(namespace string, args []string) []prompt
 		if len(args) == 3 {
 			switch second {
 			case "componentstatuses", "cs":
-				return prompt.FilterContains(getComponentStatusCompletions(c.client), third, true)
+				return prompt.FilterContains(clientgo.GetComponentStatusCompletions(c.client), third, true)
 			case "configmaps", "cm":
-				return prompt.FilterContains(getConfigMapSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetConfigMapSuggestions(c.client, namespace), third, true)
 			case "daemonsets", "ds":
-				return prompt.FilterContains(getDaemonSetSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetDaemonSetSuggestions(c.client, namespace), third, true)
 			case "deploy", "deployments":
-				return prompt.FilterContains(getDeploymentSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetDeploymentSuggestions(c.client, namespace), third, true)
 			case "endpoints", "ep":
-				return prompt.FilterContains(getEndpointsSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetEndpointsSuggestions(c.client, namespace), third, true)
 			case "ingresses", "ing":
-				return prompt.FilterContains(getIngressSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetIngressSuggestions(c.client, namespace), third, true)
 			case "limitranges", "limits":
-				return prompt.FilterContains(getLimitRangeSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetLimitRangeSuggestions(c.client, namespace), third, true)
 			case "namespaces", "ns":
-				return prompt.FilterContains(getNameSpaceSuggestions(c.namespaceList), third, true)
+				return prompt.FilterContains(clientgo.GetNameSpaceSuggestions(c.namespaceList), third, true)
 			case "no", "nodes":
-				return prompt.FilterContains(getNodeSuggestions(c.client), third, true)
+				return prompt.FilterContains(clientgo.GetNodeSuggestions(c.client), third, true)
 			case "po", "pod", "pods":
-				return prompt.FilterContains(getPodSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetPodSuggestions(c.client, namespace), third, true)
 			case "persistentvolumeclaims", "pvc":
-				return prompt.FilterContains(getPersistentVolumeClaimSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetPersistentVolumeClaimSuggestions(c.client, namespace), third, true)
 			case "persistentvolumes", "pv":
-				return prompt.FilterContains(getPersistentVolumeSuggestions(c.client), third, true)
+				return prompt.FilterContains(clientgo.GetPersistentVolumeSuggestions(c.client), third, true)
 			case "podsecuritypolicies", "psp":
-				return prompt.FilterContains(getPodSecurityPolicySuggestions(c.client), third, true)
+				return prompt.FilterContains(clientgo.GetPodSecurityPolicySuggestions(c.client), third, true)
 			case "podtemplates":
-				return prompt.FilterContains(getPodTemplateSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetPodTemplateSuggestions(c.client, namespace), third, true)
 			case "replicasets", "rs":
-				return prompt.FilterContains(getReplicaSetSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetReplicaSetSuggestions(c.client, namespace), third, true)
 			case "replicationcontrollers", "rc":
-				return prompt.FilterContains(getReplicationControllerSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetReplicationControllerSuggestions(c.client, namespace), third, true)
 			case "resourcequotas", "quota":
-				return prompt.FilterContains(getResourceQuotasSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetResourceQuotasSuggestions(c.client, namespace), third, true)
 			case "secrets":
-				return prompt.FilterContains(getSecretSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetSecretSuggestions(c.client, namespace), third, true)
 			case "sa", "serviceaccounts":
-				return prompt.FilterContains(getServiceAccountSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetServiceAccountSuggestions(c.client, namespace), third, true)
 			case "svc", "services":
-				return prompt.FilterContains(getServiceSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetServiceSuggestions(c.client, namespace), third, true)
 			case "job", "jobs":
-				return prompt.FilterContains(getJobSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetJobSuggestions(c.client, namespace), third, true)
 			}
 		}
 	case "describe":
@@ -223,47 +230,47 @@ func (c *Completer) argumentsCompleter(namespace string, args []string) []prompt
 		if len(args) == 3 {
 			switch second {
 			case "componentstatuses", "cs":
-				return prompt.FilterContains(getComponentStatusCompletions(c.client), third, true)
+				return prompt.FilterContains(clientgo.GetComponentStatusCompletions(c.client), third, true)
 			case "configmaps", "cm":
-				return prompt.FilterContains(getConfigMapSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetConfigMapSuggestions(c.client, namespace), third, true)
 			case "daemonsets", "ds":
-				return prompt.FilterContains(getDaemonSetSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetDaemonSetSuggestions(c.client, namespace), third, true)
 			case "deploy", "deployments":
-				return prompt.FilterContains(getDeploymentSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetDeploymentSuggestions(c.client, namespace), third, true)
 			case "endpoints", "ep":
-				return prompt.FilterContains(getEndpointsSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetEndpointsSuggestions(c.client, namespace), third, true)
 			case "ingresses", "ing":
-				return prompt.FilterContains(getIngressSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetIngressSuggestions(c.client, namespace), third, true)
 			case "limitranges", "limits":
-				return prompt.FilterContains(getLimitRangeSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetLimitRangeSuggestions(c.client, namespace), third, true)
 			case "namespaces", "ns":
-				return prompt.FilterContains(getNameSpaceSuggestions(c.namespaceList), third, true)
+				return prompt.FilterContains(clientgo.GetNameSpaceSuggestions(c.namespaceList), third, true)
 			case "no", "nodes":
-				return prompt.FilterContains(getNodeSuggestions(c.client), third, true)
+				return prompt.FilterContains(clientgo.GetNodeSuggestions(c.client), third, true)
 			case "po", "pod", "pods":
-				return prompt.FilterContains(getPodSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetPodSuggestions(c.client, namespace), third, true)
 			case "persistentvolumeclaims", "pvc":
-				return prompt.FilterContains(getPersistentVolumeClaimSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetPersistentVolumeClaimSuggestions(c.client, namespace), third, true)
 			case "persistentvolumes", "pv":
-				return prompt.FilterContains(getPersistentVolumeSuggestions(c.client), third, true)
+				return prompt.FilterContains(clientgo.GetPersistentVolumeSuggestions(c.client), third, true)
 			case "podsecuritypolicies", "psp":
-				return prompt.FilterContains(getPodSecurityPolicySuggestions(c.client), third, true)
+				return prompt.FilterContains(clientgo.GetPodSecurityPolicySuggestions(c.client), third, true)
 			case "podtemplates":
-				return prompt.FilterContains(getPodTemplateSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetPodTemplateSuggestions(c.client, namespace), third, true)
 			case "replicasets", "rs":
-				return prompt.FilterContains(getReplicaSetSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetReplicaSetSuggestions(c.client, namespace), third, true)
 			case "replicationcontrollers", "rc":
-				return prompt.FilterContains(getReplicationControllerSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetReplicationControllerSuggestions(c.client, namespace), third, true)
 			case "resourcequotas", "quota":
-				return prompt.FilterContains(getResourceQuotasSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetResourceQuotasSuggestions(c.client, namespace), third, true)
 			case "secrets":
-				return prompt.FilterContains(getSecretSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetSecretSuggestions(c.client, namespace), third, true)
 			case "sa", "serviceaccounts":
-				return prompt.FilterContains(getServiceAccountSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetServiceAccountSuggestions(c.client, namespace), third, true)
 			case "svc", "services":
-				return prompt.FilterContains(getServiceSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetServiceSuggestions(c.client, namespace), third, true)
 			case "job", "jobs":
-				return prompt.FilterContains(getJobSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetJobSuggestions(c.client, namespace), third, true)
 			}
 		}
 	case "create":
@@ -289,47 +296,47 @@ func (c *Completer) argumentsCompleter(namespace string, args []string) []prompt
 		if len(args) == 3 {
 			switch second {
 			case "componentstatuses", "cs":
-				return prompt.FilterContains(getComponentStatusCompletions(c.client), third, true)
+				return prompt.FilterContains(clientgo.GetComponentStatusCompletions(c.client), third, true)
 			case "configmaps", "cm":
-				return prompt.FilterContains(getConfigMapSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetConfigMapSuggestions(c.client, namespace), third, true)
 			case "daemonsets", "ds":
-				return prompt.FilterContains(getDaemonSetSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetDaemonSetSuggestions(c.client, namespace), third, true)
 			case "deploy", "deployments":
-				return prompt.FilterContains(getDeploymentSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetDeploymentSuggestions(c.client, namespace), third, true)
 			case "endpoints", "ep":
-				return prompt.FilterContains(getEndpointsSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetEndpointsSuggestions(c.client, namespace), third, true)
 			case "ingresses", "ing":
-				return prompt.FilterContains(getIngressSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetIngressSuggestions(c.client, namespace), third, true)
 			case "limitranges", "limits":
-				return prompt.FilterContains(getLimitRangeSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetLimitRangeSuggestions(c.client, namespace), third, true)
 			case "namespaces", "ns":
-				return prompt.FilterContains(getNameSpaceSuggestions(c.namespaceList), third, true)
+				return prompt.FilterContains(clientgo.GetNameSpaceSuggestions(c.namespaceList), third, true)
 			case "no", "nodes":
-				return prompt.FilterContains(getNodeSuggestions(c.client), third, true)
+				return prompt.FilterContains(clientgo.GetNodeSuggestions(c.client), third, true)
 			case "po", "pod", "pods":
-				return prompt.FilterContains(getPodSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetPodSuggestions(c.client, namespace), third, true)
 			case "persistentvolumeclaims", "pvc":
-				return prompt.FilterContains(getPersistentVolumeClaimSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetPersistentVolumeClaimSuggestions(c.client, namespace), third, true)
 			case "persistentvolumes", "pv":
-				return prompt.FilterContains(getPersistentVolumeSuggestions(c.client), third, true)
+				return prompt.FilterContains(clientgo.GetPersistentVolumeSuggestions(c.client), third, true)
 			case "podsecuritypolicies", "psp":
-				return prompt.FilterContains(getPodSecurityPolicySuggestions(c.client), third, true)
+				return prompt.FilterContains(clientgo.GetPodSecurityPolicySuggestions(c.client), third, true)
 			case "podtemplates":
-				return prompt.FilterContains(getPodTemplateSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetPodTemplateSuggestions(c.client, namespace), third, true)
 			case "replicasets", "rs":
-				return prompt.FilterContains(getReplicaSetSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetReplicaSetSuggestions(c.client, namespace), third, true)
 			case "replicationcontrollers", "rc":
-				return prompt.FilterContains(getReplicationControllerSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetReplicationControllerSuggestions(c.client, namespace), third, true)
 			case "resourcequotas", "quota":
-				return prompt.FilterContains(getResourceQuotasSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetResourceQuotasSuggestions(c.client, namespace), third, true)
 			case "secrets":
-				return prompt.FilterContains(getSecretSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetSecretSuggestions(c.client, namespace), third, true)
 			case "sa", "serviceaccounts":
-				return prompt.FilterContains(getServiceAccountSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetServiceAccountSuggestions(c.client, namespace), third, true)
 			case "svc", "services":
-				return prompt.FilterContains(getServiceSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetServiceSuggestions(c.client, namespace), third, true)
 			case "job", "jobs":
-				return prompt.FilterContains(getJobSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetJobSuggestions(c.client, namespace), third, true)
 			}
 		}
 	case "edit":
@@ -341,63 +348,63 @@ func (c *Completer) argumentsCompleter(namespace string, args []string) []prompt
 			third := args[2]
 			switch args[1] {
 			case "componentstatuses", "cs":
-				return prompt.FilterContains(getComponentStatusCompletions(c.client), third, true)
+				return prompt.FilterContains(clientgo.GetComponentStatusCompletions(c.client), third, true)
 			case "configmaps", "cm":
-				return prompt.FilterContains(getConfigMapSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetConfigMapSuggestions(c.client, namespace), third, true)
 			case "daemonsets", "ds":
-				return prompt.FilterContains(getDaemonSetSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetDaemonSetSuggestions(c.client, namespace), third, true)
 			case "deploy", "deployments":
-				return prompt.FilterContains(getDeploymentSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetDeploymentSuggestions(c.client, namespace), third, true)
 			case "endpoints", "ep":
-				return prompt.FilterContains(getEndpointsSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetEndpointsSuggestions(c.client, namespace), third, true)
 			case "ingresses", "ing":
-				return prompt.FilterContains(getIngressSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetIngressSuggestions(c.client, namespace), third, true)
 			case "limitranges", "limits":
-				return prompt.FilterContains(getLimitRangeSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetLimitRangeSuggestions(c.client, namespace), third, true)
 			case "namespaces", "ns":
-				return prompt.FilterContains(getNameSpaceSuggestions(c.namespaceList), third, true)
+				return prompt.FilterContains(clientgo.GetNameSpaceSuggestions(c.namespaceList), third, true)
 			case "no", "nodes":
-				return prompt.FilterContains(getNodeSuggestions(c.client), third, true)
+				return prompt.FilterContains(clientgo.GetNodeSuggestions(c.client), third, true)
 			case "po", "pod", "pods":
-				return prompt.FilterContains(getPodSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetPodSuggestions(c.client, namespace), third, true)
 			case "persistentvolumeclaims", "pvc":
-				return prompt.FilterContains(getPersistentVolumeClaimSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetPersistentVolumeClaimSuggestions(c.client, namespace), third, true)
 			case "persistentvolumes", "pv":
-				return prompt.FilterContains(getPersistentVolumeSuggestions(c.client), third, true)
+				return prompt.FilterContains(clientgo.GetPersistentVolumeSuggestions(c.client), third, true)
 			case "podsecuritypolicies", "psp":
-				return prompt.FilterContains(getPodSecurityPolicySuggestions(c.client), third, true)
+				return prompt.FilterContains(clientgo.GetPodSecurityPolicySuggestions(c.client), third, true)
 			case "podtemplates":
-				return prompt.FilterContains(getPodTemplateSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetPodTemplateSuggestions(c.client, namespace), third, true)
 			case "replicasets", "rs":
-				return prompt.FilterContains(getReplicaSetSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetReplicaSetSuggestions(c.client, namespace), third, true)
 			case "replicationcontrollers", "rc":
-				return prompt.FilterContains(getReplicationControllerSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetReplicationControllerSuggestions(c.client, namespace), third, true)
 			case "resourcequotas", "quota":
-				return prompt.FilterContains(getResourceQuotasSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetResourceQuotasSuggestions(c.client, namespace), third, true)
 			case "secrets":
-				return prompt.FilterContains(getSecretSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetSecretSuggestions(c.client, namespace), third, true)
 			case "sa", "serviceaccounts":
-				return prompt.FilterContains(getServiceAccountSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetServiceAccountSuggestions(c.client, namespace), third, true)
 			case "svc", "services":
-				return prompt.FilterContains(getServiceSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetServiceSuggestions(c.client, namespace), third, true)
 			case "job", "jobs":
-				return prompt.FilterContains(getJobSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetJobSuggestions(c.client, namespace), third, true)
 			}
 		}
 
 	case "namespace":
 		if len(args) == 2 {
-			return prompt.FilterContains(getNameSpaceSuggestions(c.namespaceList), args[1], true)
+			return prompt.FilterContains(clientgo.GetNameSpaceSuggestions(c.namespaceList), args[1], true)
 		}
 	case "logs":
 		if len(args) == 2 {
-			return prompt.FilterContains(getPodSuggestions(c.client, namespace), args[1], true)
+			return prompt.FilterContains(clientgo.GetPodSuggestions(c.client, namespace), args[1], true)
 		}
 	case "rolling-update", "rollingupdate":
 		if len(args) == 2 {
-			return prompt.FilterContains(getReplicationControllerSuggestions(c.client, namespace), args[1], true)
+			return prompt.FilterContains(clientgo.GetReplicationControllerSuggestions(c.client, namespace), args[1], true)
 		} else if len(args) == 3 {
-			return prompt.FilterContains(getReplicationControllerSuggestions(c.client, namespace), args[2], true)
+			return prompt.FilterContains(clientgo.GetReplicationControllerSuggestions(c.client, namespace), args[2], true)
 		}
 	case "scale", "resize":
 		second := args[1]
@@ -419,11 +426,11 @@ func (c *Completer) argumentsCompleter(namespace string, args []string) []prompt
 		if len(args) == 3 {
 			switch second {
 			case "replicasets", "rs":
-				return prompt.FilterContains(getReplicaSetSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetReplicaSetSuggestions(c.client, namespace), third, true)
 			case "deploy", "deployments":
-				return prompt.FilterContains(getDeploymentSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetDeploymentSuggestions(c.client, namespace), third, true)
 			case "replicationcontrollers", "rc":
-				return prompt.FilterContains(getReplicationControllerSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetReplicationControllerSuggestions(c.client, namespace), third, true)
 			}
 		}
 
@@ -433,22 +440,22 @@ func (c *Completer) argumentsCompleter(namespace string, args []string) []prompt
 		fallthrough
 	case "uncordon":
 		if len(args) == 2 {
-			return prompt.FilterHasPrefix(getNodeSuggestions(c.client), args[1], true)
+			return prompt.FilterHasPrefix(clientgo.GetNodeSuggestions(c.client), args[1], true)
 		}
 	case "attach":
 		if len(args) == 2 {
-			return prompt.FilterContains(getPodSuggestions(c.client, namespace), args[1], true)
+			return prompt.FilterContains(clientgo.GetPodSuggestions(c.client, namespace), args[1], true)
 		}
 	case "exec":
 		if len(args) == 2 {
-			return prompt.FilterContains(getPodSuggestions(c.client, namespace), args[1], true)
+			return prompt.FilterContains(clientgo.GetPodSuggestions(c.client, namespace), args[1], true)
 		}
 	case "port-forward":
 		if len(args) == 2 {
-			return prompt.FilterContains(getPodSuggestions(c.client, namespace), args[1], true)
+			return prompt.FilterContains(clientgo.GetPodSuggestions(c.client, namespace), args[1], true)
 		}
 		if len(args) == 3 {
-			return prompt.FilterHasPrefix(getPortsFromPodName(namespace, args[1]), args[2], true)
+			return prompt.FilterHasPrefix(clientgo.GetPortsFromPodName(namespace, args[1]), args[2], true)
 		}
 	case "rollout":
 		subCommands := []prompt.Suggest{
@@ -461,31 +468,6 @@ func (c *Completer) argumentsCompleter(namespace string, args []string) []prompt
 			return prompt.FilterHasPrefix(subCommands, args[1], true)
 		}
 	case "annotate":
-	case "config":
-		subCommands := []prompt.Suggest{
-			{Text: "current-context", Description: "Displays the current-context"},
-			{Text: "delete-cluster", Description: "Delete the specified cluster from the kubeconfig"},
-			{Text: "delete-context", Description: "Delete the specified context from the kubeconfig"},
-			{Text: "get-clusters", Description: "Display clusters defined in the kubeconfig"},
-			{Text: "get-contexts", Description: "Describe one or many contexts"},
-			{Text: "set", Description: "Sets an individual value in a kubeconfig file"},
-			{Text: "set-cluster", Description: "Sets a cluster entry in kubeconfig"},
-			{Text: "set-context", Description: "Sets a context entry in kubeconfig"},
-			{Text: "set-credentials", Description: "Sets a user entry in kubeconfig"},
-			{Text: "unset", Description: "Unsets an individual value in a kubeconfig file"},
-			{Text: "use-context", Description: "Sets the current-context in a kubeconfig file"},
-			{Text: "view", Description: "Display merged kubeconfig settings or a specified kubeconfig file"},
-		}
-		if len(args) == 2 {
-			return prompt.FilterHasPrefix(subCommands, args[1], true)
-		}
-		if len(args) == 3 {
-			third := args[2]
-			switch args[1] {
-			case "use-context":
-				return prompt.FilterContains(getContextSuggestions(), third, true)
-			}
-		}
 	case "cluster-info":
 		subCommands := []prompt.Suggest{
 			{Text: "dump", Description: "Dump lots of relevant info for debugging and diagnosis"},
@@ -512,9 +494,9 @@ func (c *Completer) argumentsCompleter(namespace string, args []string) []prompt
 		if len(args) == 3 {
 			switch second {
 			case "no", "node", "nodes":
-				return prompt.FilterContains(getNodeSuggestions(c.client), third, true)
+				return prompt.FilterContains(clientgo.GetNodeSuggestions(c.client), third, true)
 			case "po", "pod", "pods":
-				return prompt.FilterContains(getPodSuggestions(c.client, namespace), third, true)
+				return prompt.FilterContains(clientgo.GetPodSuggestions(c.client, namespace), third, true)
 			}
 		}
 	default:

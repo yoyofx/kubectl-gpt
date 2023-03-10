@@ -16,16 +16,16 @@ const (
 
 var (
 	client       *openai.Client
-	tempYamlFile = ""
+	TempYamlFile = ""
 )
 
 func InitEnv() {
-	envToken, exists := os.LookupEnv("CHATGPT_TOKEN")
+	envToken, exists := os.LookupEnv("KUBE_CHATGPT_TOKEN")
 	if !exists {
-		fmt.Println("CHATGPT_TOKEN is not set! initializing error , program will be shut down!")
-		os.Exit(1)
+		fmt.Println("KUBE_CHATGPT_TOKEN is not set! initializing error , chatGPT funcations will be not available !")
+	} else {
+		client = openai.NewClient(envToken)
 	}
-	client = openai.NewClient(envToken)
 }
 
 func Question(pref string, content string) {
@@ -53,6 +53,7 @@ func Question(pref string, content string) {
 	)
 
 	if err != nil {
+		fmt.Println(err.Error())
 		return
 	}
 
@@ -74,10 +75,10 @@ func ParseCommandAndYAML(content string) (string, bool) {
 	content = strings.Trim(content, "\n")
 	if strings.HasPrefix(content, "apiVersion:") {
 		//resource yaml
-		tempYamlFile = content
+		TempYamlFile = content
 		return content, true
 	} else {
-		tempYamlFile = ""
+		TempYamlFile = ""
 	}
 	return content, false
 }

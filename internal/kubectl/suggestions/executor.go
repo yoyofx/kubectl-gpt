@@ -1,12 +1,12 @@
 package kube
 
 import (
-	"bytes"
 	"fmt"
-	"kubectl-gpt/chatgpt"
+	"kubectl-gpt/internal/chatgpt"
 	"kubectl-gpt/internal/debug"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 )
 
@@ -15,7 +15,6 @@ func Executor(s string) {
 	if s == "" {
 		return
 	} else if s == "quit" || s == "exit" {
-		fmt.Println("Bye!")
 		os.Exit(0)
 		return
 	}
@@ -36,17 +35,37 @@ func Executor(s string) {
 		} else {
 			fmt.Println("Error, please enter the question!")
 		}
+	} else if strings.HasPrefix(s, "switch") {
+		args := strings.Split(s, " ")
+		if len(args) > 1 {
+			err := os.Setenv("KUBECONFIG", args[1])
+			if err == nil {
+				fmt.Println("ENV: KUBECONFIG=", args[1])
+			}
+		}
 	} else if strings.HasPrefix(s, "save") {
 		args := strings.Split(s, " ")
 		if len(args) > 1 {
-			//save yaml to file
-		}
-	} else if strings.HasPrefix(s, "switch") {
+			if chatgpt.TempYamlFile != "" {
+				//save yaml to file
 
+			} else {
+				fmt.Println("Not Yaml to save , please re-quest chatGPT.")
+			}
+		}
 	} else {
 		cmdStr := "kubectl " + s
 		debug.Log(cmdStr)
-		cmd := exec.Command("/bin/sh", "-c", cmdStr)
+		var shell, flag string
+		if runtime.GOOS == "windows" {
+			shell = "cmd"
+			flag = "/c"
+		} else {
+			shell = "/bin/sh"
+			flag = "-c"
+		}
+
+		cmd := exec.Command(shell, flag, cmdStr)
 		cmd.Stdin = os.Stdin
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -54,24 +73,6 @@ func Executor(s string) {
 			fmt.Printf("Got error: %s\n", err.Error())
 		}
 	}
+
 	return
-}
-
-func ExecuteAndGetResult(s string) string {
-	s = strings.TrimSpace(s)
-	if s == "" {
-		debug.Log("you need to pass the something arguments")
-		return ""
-	}
-
-	out := &bytes.Buffer{}
-	cmd := exec.Command("/bin/sh", "-c", s)
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = out
-	if err := cmd.Run(); err != nil {
-		debug.Log(err.Error())
-		return ""
-	}
-	r := string(out.Bytes())
-	return r
 }
