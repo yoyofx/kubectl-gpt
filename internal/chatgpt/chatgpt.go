@@ -22,13 +22,17 @@ var (
 func InitEnv() {
 	envToken, exists := os.LookupEnv("KUBE_CHATGPT_TOKEN")
 	if !exists {
-		fmt.Println("KUBE_CHATGPT_TOKEN is not set! initializing error , chatGPT funcations will be not available !")
+		fmt.Println("ENV: KUBE_CHATGPT_TOKEN is not set! initializing error , chatGPT funcations will be not available !")
 	} else {
 		client = openai.NewClient(envToken)
 	}
 }
 
 func Question(pref string, content string) {
+	if client == nil {
+		fmt.Println("ENV: KUBE_CHATGPT_TOKEN is not set! chatGPT funcations will be not available !")
+		return
+	}
 	resp, err := client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
