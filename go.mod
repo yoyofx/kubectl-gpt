@@ -1,4 +1,4 @@
-module kubectl-gpt
+module github.com/yoyofx/kubectl-gpt
 
 go 1.18
 

@@ -2,8 +2,8 @@ package kube
 
 import (
 	prompt "github.com/c-bata/go-prompt"
-	"kubectl-gpt/internal/kubectl"
-	"kubectl-gpt/internal/kubectl/clientgo"
+	"github.com/yoyofx/kubectl-gpt/internal/kubectl"
+	"github.com/yoyofx/kubectl-gpt/internal/kubectl/clientgo"
 )
 
 var commands = []prompt.Suggest{

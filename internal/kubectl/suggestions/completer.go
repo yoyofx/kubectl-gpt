@@ -1,7 +1,7 @@
 package kube
 
 import (
-	"kubectl-gpt/internal/kubectl/clientgo"
+	"github.com/yoyofx/kubectl-gpt/internal/kubectl/clientgo"
 	"os"
 	"strings"
 

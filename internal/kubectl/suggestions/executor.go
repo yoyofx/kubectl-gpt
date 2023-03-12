@@ -2,8 +2,8 @@ package kube
 
 import (
 	"fmt"
-	"kubectl-gpt/internal/chatgpt"
-	"kubectl-gpt/internal/debug"
+	"github.com/yoyofx/kubectl-gpt/internal/chatgpt"
+	"github.com/yoyofx/kubectl-gpt/internal/debug"
 	"os"
 	"os/exec"
 	"runtime"

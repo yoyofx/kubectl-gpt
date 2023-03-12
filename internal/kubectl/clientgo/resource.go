@@ -2,7 +2,7 @@ package clientgo
 
 import (
 	"fmt"
-	"kubectl-gpt/internal/debug"
+	"github.com/yoyofx/kubectl-gpt/internal/debug"
 	"sort"
 	"sync"
 	"sync/atomic"

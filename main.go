@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"github.com/c-bata/go-prompt"
 	"github.com/c-bata/go-prompt/completer"
-	"kubectl-gpt/internal/chatgpt"
-	"kubectl-gpt/internal/kubectl"
-	"kubectl-gpt/internal/kubectl/suggestions"
+	"github.com/yoyofx/kubectl-gpt/internal/chatgpt"
+	"github.com/yoyofx/kubectl-gpt/internal/kubectl"
+	"github.com/yoyofx/kubectl-gpt/internal/kubectl/suggestions"
 	"os"
 )
 
