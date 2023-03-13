@@ -20,17 +20,20 @@ func Executor(s string) {
 	}
 	if strings.HasPrefix(s, "gen") { // ask chatGPT , generate k8s resources and commands. .
 		args := strings.Split(s, " ")
+		cmd := strings.Join(args[2:len(args)], " ")
 		if len(args) > 2 {
 			cmdPref := ""
+			additional := ""
 			switch args[1] {
 			case "yaml":
 				cmdPref = chatgpt.KUBERNETES_RESOURCES_YAML
 			case "command":
 				cmdPref = chatgpt.KUBERNETES_COMMAND
+				additional = "\n\n" + "output only kubectl command"
+				cmd = cmd + additional
 			}
 
 			fmt.Println("Requesting chatGPT please wait ................")
-			cmd := strings.Join(args[2:len(args)], " ")
 			chatgpt.Question(cmdPref, cmd)
 		} else {
 			fmt.Println("Error, please enter the question!")
